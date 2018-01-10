@@ -26,12 +26,18 @@
 #ifndef __WIRING_ESP_H__
 #define __WIRING_ESP_H__
 
+// C++ wrapper
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <gpio.h>
 #include <osapi.h>
 #include <user_interface.h>
 
+
 // Pin modes
-typedef enum {
+enum pin_mode {
 	INPUT = 0,
 	OUTPUT,
 	INPUT_PULLUP,
@@ -40,7 +46,7 @@ typedef enum {
 	SOFT_PWM_OUTPUT,
 	SOFT_TONE_OUTPUT,
 	PWM_TONE_OUTPUT
-} pin_mode_t;
+};
 
 #define LOW		0
 #define HIGH	1
@@ -57,11 +63,6 @@ typedef enum {
 
 
 // Function prototypes
-
-// C++ wrapper
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // Core wiringESP functions
 void pinMode(uint8_t pin, uint8_t mode);
