@@ -48,17 +48,24 @@ enum pin_mode {
 	PWM_TONE_OUTPUT
 };
 
-#define LOW		0
-#define HIGH	1
+#define LOW  0
+#define HIGH 1
+
+#ifndef OFF
+#define OFF  LOW
+#endif
+#ifndef ON
+#define ON   HIGH
+#endif
 
 // Pull up/down/none
-#define PUD_OFF		0
-#define PUD_DOWN	1
-#define PUD_UP		2
+#define PUD_OFF  0
+#define PUD_DOWN 1
+#define PUD_UP   2
 
 // Interrupt levels. Mimic Arduino like interrupt modes.
-#define CHANGE GPIO_PIN_INTR_ANYEDGE
-#define RISING GPIO_PIN_INTR_POSEDGE
+#define CHANGE  GPIO_PIN_INTR_ANYEDGE
+#define RISING  GPIO_PIN_INTR_POSEDGE
 #define FALLING GPIO_PIN_INTR_NEGEDGE
 
 
