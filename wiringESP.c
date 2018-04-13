@@ -288,7 +288,7 @@ detachInterrupt(uint8_t pin)
 /**
  * @brief  Delay in milliseconds (ms).
  * @author Holger Mueller
- * @date   2017-12-14
+ * @date   2017-12-14, 2018-03-26
  *
  * @param  ms - Delay time in milliseconds (ms).
  */
@@ -297,11 +297,10 @@ delay(unsigned long ms)
 {
 	uint32_t i;
 
-	for (i = 0; i < ms; i++) {
-		os_delay_us(1000);
+	for (i = ms; i > 0; i--) {
+		os_delay_us(1000); // delay 1 ms
 	}
 }
-
 
 /**
  * NOT YET IMPLEMENTED!
