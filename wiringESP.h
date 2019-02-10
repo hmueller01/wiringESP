@@ -71,6 +71,10 @@ enum pin_mode {
 
 // Function prototypes
 
+// Missing ESP8266 SDK function prototypes. GCC will warn on these if in c99 mode.
+void ets_isr_mask(unsigned intr);
+void ets_isr_unmask(unsigned intr);
+
 // Core wiringESP functions
 void pinMode(uint8_t pin, uint8_t mode);
 void pullUpDnControl(uint8_t pin, uint8_t pud);
