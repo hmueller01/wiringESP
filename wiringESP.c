@@ -36,7 +36,7 @@
 //   Take a Wiring pin (0 through X) and re-map it to the ESP8266 SOC GPIO/MUX reg
 #define FUNC 0
 #define NAME 1
-LOCAL int pinToGpioMux[GPIO_PIN_COUNT][2] = {
+LOCAL const int pinToGpioMux[GPIO_PIN_COUNT][2] = {
 	// FUNC, NAME
 	{FUNC_GPIO0, PERIPHS_IO_MUX_GPIO0_U}, // 0
 	{FUNC_GPIO1, PERIPHS_IO_MUX_U0TXD_U}, // 1
@@ -88,7 +88,7 @@ checkPin(uint8_t pin)
 /**
  * @brief  Sets the mode of a pin to be input, output or PWM output.
  * @author Holger Mueller
- * @date   2017-12-11, 2017-12-20
+ * @date   2017-12-11, 2017-12-20, 2018-05-15
  *
  * @param  pin - Pin number (see pinToGpioMux) to set the mode.
  * @param  mode - INPUT, INPUT_PULLUP or OUTPUT (see pin_mode_t),
@@ -102,18 +102,34 @@ pinMode(uint8_t pin, uint8_t mode)
 	}
 	switch (mode) {
 	case INPUT:
+		ETS_GPIO_INTR_DISABLE();
 		PIN_FUNC_SELECT(pinToGpioMux[pin][NAME], pinToGpioMux[pin][FUNC]);
 		GPIO_DIS_OUTPUT(GPIO_ID_PIN(pin));
 		PIN_PULLUP_DIS(pinToGpioMux[pin][NAME]);
+		ETS_GPIO_INTR_ENABLE();
 		break;
 	case INPUT_PULLUP:
+		ETS_GPIO_INTR_DISABLE();
 		PIN_FUNC_SELECT(pinToGpioMux[pin][NAME], pinToGpioMux[pin][FUNC]);
 		GPIO_DIS_OUTPUT(GPIO_ID_PIN(pin));
 		PIN_PULLUP_EN(pinToGpioMux[pin][NAME]);
+		ETS_GPIO_INTR_ENABLE();
 		break;
 	case OUTPUT:
+		ETS_GPIO_INTR_DISABLE();
 		PIN_FUNC_SELECT(pinToGpioMux[pin][NAME], pinToGpioMux[pin][FUNC]);
 		GPIO_OUTPUT_SET(GPIO_ID_PIN(pin), LOW);
+		ETS_GPIO_INTR_ENABLE();
+		break;
+	case OPENDRAIN:
+		ETS_GPIO_INTR_DISABLE();
+		PIN_FUNC_SELECT(pinToGpioMux[pin][NAME], pinToGpioMux[pin][FUNC]);
+		GPIO_REG_WRITE(GPIO_PIN_ADDR(GPIO_ID_PIN(pin)),
+			GPIO_REG_READ(GPIO_PIN_ADDR(GPIO_ID_PIN(pin))) |
+			GPIO_PIN_PAD_DRIVER_SET(GPIO_PAD_DRIVER_ENABLE)); // open drain
+		GPIO_REG_WRITE(GPIO_ENABLE_ADDRESS,
+			GPIO_REG_READ(GPIO_ENABLE_ADDRESS) | (1 << pin));
+		ETS_GPIO_INTR_ENABLE();
 		break;
 	case PWM_OUTPUT:
 	case GPIO_CLOCK:
@@ -132,10 +148,7 @@ pinMode(uint8_t pin, uint8_t mode)
  * @author Holger Mueller
  * @date   2017-12-12
  *
- * The ESP8266 only has pull-ups, so PUD_DOWN is not supported here.
- *
- * Note: The Arduino only has pull-ups and these are enabled by
- * writing 1 to a port when in input mode.
+ * Note: The ESP8266 only has pull-ups, so PUD_DOWN is not supported here.
  *
  * @param  pin - Pin number (see pinToGpioMux) to set the mode.
  * @param  pud - Enable (PUD_UP) or disable (PUD_OFF) pull-up.
@@ -162,7 +175,7 @@ pullUpDnControl(uint8_t pin, uint8_t pud)
  * @author Holger Mueller
  * @date   2017-12-12
  *
- * @param  pin - Pin number (see pinToGpioMux) to set the mode.
+ * @param  pin - Pin number to read from.
  * @return Status of pin (LOW or HIGH).
  */
 uint8_t ICACHE_FLASH_ATTR
@@ -176,11 +189,11 @@ digitalRead(uint8_t pin)
 
 
 /**
- * @brief  Set an output bit.
+ * @brief  Set an output pin (LOW or HIGH).
  * @author Holger Mueller
  * @date   2017-12-12
  *
- * @param  pin - Pin number (see pinToGpioMux) to set the mode.
+ * @param  pin - Pin number to write to.
  * @param  value - Level of pin (LOW or HIGH).
  */
 void ICACHE_FLASH_ATTR
@@ -288,7 +301,7 @@ detachInterrupt(uint8_t pin)
 /**
  * @brief  Delay in milliseconds (ms).
  * @author Holger Mueller
- * @date   2017-12-14
+ * @date   2017-12-14, 2018-03-26
  *
  * @param  ms - Delay time in milliseconds (ms).
  */
@@ -297,11 +310,10 @@ delay(unsigned long ms)
 {
 	uint32_t i;
 
-	for (i = 0; i < ms; i++) {
-		os_delay_us(1000);
+	for (i = ms; i > 0; i--) {
+		os_delay_us(1000); // delay 1 ms
 	}
 }
-
 
 /**
  * NOT YET IMPLEMENTED!
