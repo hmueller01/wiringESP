@@ -16,9 +16,10 @@
 extern "C" {
 #endif
 
+#include <c_types.h>
 #include <gpio.h>
 #include <osapi.h>
-#include <user_interface.h>
+#include <version.h>
 
 
 // Pin modes
@@ -58,8 +59,10 @@ enum pin_mode {
 // Function prototypes
 
 // Missing ESP8266 SDK function prototypes. GCC will warn on these if in c99 mode.
+#if ESP_SDK_VERSION_NUMBER < 0x030004
 void ets_isr_mask(unsigned intr);
 void ets_isr_unmask(unsigned intr);
+#endif
 
 // Core wiringESP functions
 void pinMode(uint8_t pin, uint8_t mode);
