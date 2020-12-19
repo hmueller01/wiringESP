@@ -19,6 +19,7 @@ extern "C" {
 #include <c_types.h>
 #include <gpio.h>
 #include <osapi.h>
+#include <user_interface.h>
 #include <version.h>
 
 
