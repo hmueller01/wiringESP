@@ -226,7 +226,7 @@ interruptHandler(void *arg)
  * @return true if ok, otherwise false.
  */
 bool ICACHE_FLASH_ATTR
-attachInterrupt(uint8_t pin, void (*function)(void), uint8_t mode)
+attachInterrupt(uint8_t pin, void (*function)(void), GPIO_INT_TYPE mode)
 {
 	if (!checkPin(pin)) {
 		return false;

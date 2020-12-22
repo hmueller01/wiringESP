@@ -76,7 +76,7 @@ void digitalWrite(uint8_t pin, uint8_t value);
 //void analogWrite(uint8_t pin, int value);
 
 // Interrupts
-bool attachInterrupt(uint8_t pin, void (*function)(void), uint8_t mode);
+bool attachInterrupt(uint8_t pin, void (*function)(void), GPIO_INT_TYPE mode);
 bool detachInterrupt(uint8_t pin);
 
 // Timing extras from Arduino land
